@@ -1,0 +1,400 @@
+{
+  "name": "Upload social media post with image with cloudflare image",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Social Media Posting",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "What is your main topic?",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "What is your catagory?",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "technology"
+                  },
+                  {
+                    "option": "Marketing"
+                  },
+                  {
+                    "option": "Sports"
+                  },
+                  {
+                    "option": "education "
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "644c4961-25fb-40f2-b6f7-6a8b9e7e722c",
+      "name": "Posting for social media",
+      "webhookId": "f9d71daa-9d7f-4a56-b391-354649ca7175"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        592,
+        256
+      ],
+      "id": "093153d1-145c-4466-bbd5-d1b56b0ed8f4",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "7VoXMwTiGrHgcCC4",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        240
+      ],
+      "id": "67707ca9-cc0b-448a-b034-055d9a7967ca",
+      "name": "Tavily tool",
+      "credentials": {
+        "tavilyApi": {
+          "id": "oXQsgjYQjnqg1Vsr",
+          "name": "Tavily account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Topic: {{ $json.output }}",
+        "options": {
+          "systemMessage": "You are an expert AI Image Prompt Engineer, Creative Director, and Social Media Visual Designer.\nFor better use tavily tool\n\nYour task is to transform the user's Main Topic into one highly detailed, creative, professional, and visually compelling image generation prompt suitable for social media posts.\n\nOBJECTIVE:\nCreate a scroll-stopping, high-quality social media image that visually represents the given topic and category, complements an educational or informative social media post, and captures the audience's attention.\n\nINSTRUCTIONS:\n\n1. Analyze the Main Topic and Category to understand the subject, target audience, and appropriate visual direction.\n\n2. Create a unique, visually engaging image concept directly related to the Main Topic.\n\n3. Adapt the visual style to the Category:\n   - Technology: futuristic interfaces, modern devices, digital elements, clean tech aesthetics.\n   - Business: premium corporate visuals, professional environments, elegant compositions.\n   - Education: clear educational illustrations, learning environments, informative visual metaphors.\n   - Health: clean, trustworthy, wellness-focused imagery.\n   - Travel: cinematic landscapes, beautiful destinations, realistic photography.\n   - Science: accurate scientific concepts, detailed illustrations, modern laboratory aesthetics.\n   - Other categories: choose the most appropriate visual style automatically.\n\n4. Specify the following visual details:\n   - Main subject and supporting elements\n   - Composition and camera angle\n   - Background and environment\n   - Lighting and shadows\n   - Color palette\n   - Art style and visual mood\n   - Textures, depth, and image quality\n\n5. Choose a realistic photographic, cinematic, 3D-rendered, or premium illustrative style based on which best communicates the topic.\n\n6. Use an attractive, balanced layout with a clear visual hierarchy and strong focal point.\n\n7. Optimize the composition for a 4:5 portrait social media post (1080 × 1350 pixels).\n\n8. Leave clean negative space where a headline or branding could be added later.\n\n9. Use professional lighting, crisp details, harmonious colors, and polished commercial-quality visuals.\n\n10. Avoid clutter, distorted objects, unnecessary elements, watermarks, random letters, unreadable text, and irrelevant symbols.\n\n11. Do not include logos, brand names, or copyrighted characters unless explicitly requested.\n\n12. Do not include any text, captions, typography, or hashtags inside the generated image unless the user specifically requests text.\n\n13. Ensure the visual concept is original, relevant, aesthetically appealing, and suitable for Facebook, Instagram, and LinkedIn.\n\n14. For factual, medical, scientific, or technical concepts, prioritize visual accuracy over decorative effects.\n\n15. Write the final image generation prompt in detailed, descriptive English, between 100 and 180 words.\n\nOUTPUT RULES:\n- Return ONLY the final image generation prompt.\n- Do not include explanations, introductions, markdown formatting, or additional notes.\n- Do not generate the image yourself.\n- Do not include labels such as \"Image Prompt:\".\n- The output must be directly usable in an AI image generation tool.\n\nYour goal is to produce a visually stunning, professional, topic-relevant image prompt that can generate an eye-catching social media graphic."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "2fd0b7b5-ac02-442e-94d5-cdb83b15c2a4",
+      "name": "Image generator prompt"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Main topic: {{ $json['What is your main topic?'] }}\nCatagory: {{ $json['What is your catagory?'] }}",
+        "options": {
+          "systemMessage": "You are an expert Social Media Content Writer, Digital Marketing Strategist, and SEO Copywriter.\nFor better search must use tavily tool\n\nYour task is to create high-quality, engaging, informative, and ready-to-publish social media content based on the Main Topic and Category provided by the user.\n\nCONTENT INSTRUCTIONS:\n1. Understand the Main Topic and its Category before writing.\n2. Create an attention-grabbing headline or hook that encourages readers to continue reading.\n3. Write an engaging social media description of approximately 120–180 words.\n4. Begin with a short introduction explaining the topic and why it matters.\n5. Explain the topic clearly using simple, natural, and conversational English.\n6. Include useful information, practical tips, key benefits, or real-world examples whenever relevant.\n7. Tailor the writing style and terminology to the provided Category.\n8. Use short paragraphs and a few relevant emojis to improve readability.\n9. Make the content educational, interesting, professional, and accessible to beginners.\n10. Include a strong, natural call to action encouraging readers to comment, share, save, or follow.\n11. Generate 5–8 relevant hashtags, including category-specific and topic-specific hashtags.\n12. Optimize the post for Facebook, Instagram, and LinkedIn without making it overly promotional.\n13. Avoid robotic language, generic filler, excessive hashtags, and unnecessary repetition.\n14. Never invent statistics, research findings, or factual claims.\n15. Do not mention that the content was generated by AI.\n16. Return only the finished social media post, without explanations, notes, or additional commentary.\n\nOUTPUT FORMAT:\n[Engaging headline]\n\n[Short introduction]\n\n[Informative main description with practical value]\n\n[Call to action]\n\n[5–8 relevant hashtags]\n\nYour goal is to produce original, engaging, and valuable social media content that is ready to publish without further editing.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "56bc6d57-83b4-449c-9c76-1a570312e9f5",
+      "name": "Descirption Generator"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Topic :{{ $('Descirption Generator').item.json.output }}",
+        "options": {
+          "systemMessage": "You are an expert Social Media Headline Writer, Copywriting Specialist, and Digital Marketing Strategist.\n\nYour task is to generate highly engaging, creative, and attention-grabbing titles based on the social media description provided by the user.\n\nOBJECTIVE:\nCreate compelling titles that immediately capture attention, communicate the main idea, and encourage people to read the full social media post.\n\nINSTRUCTIONS:\n\n1. Carefully analyze the entire social media description.\n2. Identify its central topic, key message, target audience, and most interesting information.\n3. Generate 5 unique and engaging title variations based on the description.\n4. Make each title interesting, meaningful, relevant, and easy to understand.\n5. Use powerful words, curiosity, questions, numbers, or emotional hooks where appropriate.\n6. Keep titles concise, ideally between 5 and 12 words.\n7. Make titles suitable for Facebook, Instagram, and LinkedIn.\n8. Use natural, human-like language rather than robotic or generic phrases.\n9. Avoid clickbait, misleading claims, exaggerated promises, and unnecessary punctuation.\n10. Do not repeat the same idea using slightly different words.\n11. Use emojis only when they genuinely improve the title.\n12. Ensure every title accurately represents the original description.\n13. Do not introduce information that is not supported by the description.\n\nOUTPUT FORMAT:\n\nGenerate exactly 5 title variations.\n\nTitle 1: [Title]\nTitle 2: [Title]\nTitle 3: [Title]\nTitle 4: [Title]\nTitle 5: [Title]\n\nBest Recommended Title: [Select the strongest title from the five options.]\n\nOUTPUT RULES:\n- Return only the requested titles.\n- Do not write an introduction or explanation.\n- Do not generate a new social media description.\n- Do not include hashtags.\n- Keep the recommended title identical to one of the five generated titles.\n\nYour goal is to create memorable, professional, and high-converting social media titles that make people stop scrolling and want to read more.\nNot take this too long. maintain 10-20 words.\nI dont need more title. give me just 1 strong title"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        912,
+        0
+      ],
+      "id": "b1eff220-c92a-4d80-874e-66c4f961b2e6",
+      "name": "title gen"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cloudflare.com/client/v4/accounts/6a99d04437a6cfc9c102a6e248de480a/ai/run/@cf/black-forest-labs/flux-1-schnell",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n  {\n    prompt: String(\n      $('Image generator prompt').first().json.output || ''\n    ).slice(0, 2048),\n    steps: 4\n  }\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1264,
+        0
+      ],
+      "id": "0a0a965b-69ec-4010-bbd0-b2a08fa12067",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "zIZUZvRfESP5hPqK",
+          "name": "Cloudflare image generate"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "result.image",
+        "options": {
+          "fileName": "generated-image.jpg",
+          "mimeType": "image/jpeg"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.2,
+      "position": [
+        1552,
+        0
+      ],
+      "id": "956f7f59-edf2-4b8f-b4e9-eeb0ecab87db",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "content": "Use this http url \nBase URL + Account path + AI endpoint + Model ID\n\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        496,
+        -224
+      ],
+      "typeVersion": 1,
+      "id": "509852db-7204-4073-bac1-8274678cfb0b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "name": "={{ $('title gen').item.json.output }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1FSLhSuTmMQiMIglmRs0h9q4u0lZPRaNr",
+          "mode": "list",
+          "cachedResultName": "Meraj",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1FSLhSuTmMQiMIglmRs0h9q4u0lZPRaNr"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1840,
+        112
+      ],
+      "id": "392746d9-6b5e-4b0c-a5bc-0e2b83ee6108",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "q9sU0rzHeTGuvsMt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v25.0",
+        "node": "me",
+        "edge": "=photos",
+        "sendBinaryData": true,
+        "binaryPropertyName": "file:data",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "caption",
+                "value": "={{ $('title gen').item.json.output.split('\\n')[0].replace('Title 1: ', '') }}\n\n{{ $('Descirption Generator').item.json.output }}\n\n"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        -144
+      ],
+      "id": "a051c6e8-c308-43ac-8585-6e56debf78dc",
+      "name": "Facebook Graph API",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "exEI3RMGatU4d864",
+          "name": "Facebook Graph account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Posting for social media": {
+      "main": [
+        [
+          {
+            "node": "Descirption Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Descirption Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Image generator prompt",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "title gen",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Descirption Generator",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Image generator prompt",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "title gen",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descirption Generator": {
+      "main": [
+        [
+          {
+            "node": "Image generator prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image generator prompt": {
+      "main": [
+        [
+          {
+            "node": "title gen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "title gen": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Facebook Graph API",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook Graph API": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ee0601d0-5129-48d8-93ce-5e12623cac38",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8016af70e2772351af8e46a43445b221929918fc07cf4586ff34bf50bc27e012"
+  },
+  "nodeGroups": [],
+  "id": "FUeg3YyAlD7DxovN",
+  "tags": []
+}
